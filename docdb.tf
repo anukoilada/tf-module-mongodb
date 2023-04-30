@@ -1,8 +1,8 @@
 resource "aws_docdb_cluster" "docdb" {
   cluster_identifier      = "robot-${var.ENV}-docdb"
   engine                  = "docdb"
-  master_username         = local.DOCDB_USER
-  master_password         = local.DOCDB_PASS
+  master_username         = "admin1"
+  master_password         = "roboshop1"
   skip_final_snapshot     = true
   db_subnet_group_name    = aws_docdb_subnet_group.docdb_subnet_group.name
   vpc_security_group_ids  = [aws_security_group.allow_mongodb.id]
@@ -16,4 +16,12 @@ resource "aws_docdb_subnet_group" "docdb_subnet_group" {
   tags = {
     Name = "robot-${var.ENV}-docdb-subnet-group"
   }
+}
+
+# Creates Instances Needed for the DocDB Cluster
+resource "aws_docdb_cluster_instance" "cluster_instances" {
+  count              = var.DOCDB_INSTANCE_COUNT
+  identifier         = "robot-${var.ENV}-docdb-instance"
+  cluster_identifier = aws_docdb_cluster.docdb.id
+  instance_class     = var.DOCDB_INSTANCE_CLASS
 }
